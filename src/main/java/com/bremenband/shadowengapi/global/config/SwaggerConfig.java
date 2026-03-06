@@ -16,7 +16,7 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .info(new Info().title("ShadowEng")
                         .description("""
-	                            <p>내가 원하는 영상으로 쉐도잉 영어 학습을 도와주는 서비스 <b><ShadowEng></b>의 API 문서 입니다.</p>
+	                            <p>내가 원하는 영상으로 쉐도잉 영어 학습을 도와주는 서비스 ShadowEng의 API 문서 입니다.</p>
 	                            <h4>Team : BremenBand</h4>
 	                            <ul>
 		                            <li><strong>이름</strong> : <a href="#" target="_blank">Github</a></li>
