@@ -33,6 +33,10 @@ youtube:
     key: ${YOUTUBE_API_KEY}
     base-url: https://www.googleapis.com/youtube/v3
 
+python:
+  api:
+    base-url: ${PYTHON_API_URL}
+
 logging:
   level:
     org.hibernate.SQL: debug

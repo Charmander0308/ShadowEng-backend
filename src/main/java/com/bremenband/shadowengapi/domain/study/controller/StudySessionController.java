@@ -1,8 +1,11 @@
 package com.bremenband.shadowengapi.domain.study.controller;
 
+import com.bremenband.shadowengapi.domain.study.dto.req.StudySessionCreateRequest;
 import com.bremenband.shadowengapi.domain.study.dto.res.RecentStudySessionResponse;
+import com.bremenband.shadowengapi.domain.study.dto.res.StudySessionCreateResponse;
 import com.bremenband.shadowengapi.domain.study.service.StudySessionService;
 import com.bremenband.shadowengapi.global.common.ApiResponse;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,13 +35,13 @@ public class StudySessionController {
     @PostMapping
     @Operation(
             summary = "학습 세션 생성",
-            description = "인증된 사용자의 새로운 학습 세션을 생성합니다."
+            description = "embedUrl과 학습 구간(startSec, endSec)을 전달받아 세션을 생성하고 전사된 문장 목록을 반환합니다."
     )
-    public ApiResponse<?> createStudySession(
-            @Parameter(hidden = true) @AuthenticationPrincipal Long userId
-            // 필요에 따라 @RequestBody DTO가 추가될 수 있습니다.
+    public ApiResponse<StudySessionCreateResponse> createStudySession(
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId,
+            @Valid @RequestBody StudySessionCreateRequest request
     ) {
-        return null;
+        return ApiResponse.success(studySessionService.createStudySession(userId, request));
     }
 
     @GetMapping("/recent")

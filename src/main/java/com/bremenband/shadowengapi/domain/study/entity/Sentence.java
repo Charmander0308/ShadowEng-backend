@@ -37,17 +37,28 @@ public class Sentence {
     @Column(name = "duration_sec", nullable = false)
     private double durationSec;
 
+    // evaluate-audio 호출 시 레퍼런스로 사용
+    @Column(name = "word_timestamps", columnDefinition = "json")
+    private String wordTimestamps;
+
+    // evaluate-audio 호출 시 레퍼런스로 사용
+    @Column(name = "features", columnDefinition = "json")
+    private String features;
+
     @CreatedDate
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @Builder
     private Sentence(StudySession studySession, String content,
-                     double startSec, double endSec, double durationSec) {
+                     double startSec, double endSec, double durationSec,
+                     String wordTimestamps, String features) {
         this.studySession = studySession;
         this.content = content;
         this.startSec = startSec;
         this.endSec = endSec;
         this.durationSec = durationSec;
+        this.wordTimestamps = wordTimestamps;
+        this.features = features;
     }
 }

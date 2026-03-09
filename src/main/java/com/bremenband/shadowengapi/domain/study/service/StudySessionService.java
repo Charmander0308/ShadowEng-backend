@@ -1,15 +1,28 @@
 package com.bremenband.shadowengapi.domain.study.service;
 
+import com.bremenband.shadowengapi.domain.study.dto.req.StudySessionCreateRequest;
 import com.bremenband.shadowengapi.domain.study.dto.res.LatestActiveSessionResponse;
 import com.bremenband.shadowengapi.domain.study.dto.res.RecentStudySessionResponse;
+import com.bremenband.shadowengapi.domain.study.dto.res.StudySessionCreateResponse;
 import com.bremenband.shadowengapi.domain.study.dto.res.ThumbnailsResponse;
+import com.bremenband.shadowengapi.domain.study.dto.res.VideoInfoResponse;
+import com.bremenband.shadowengapi.domain.study.dto.transcription.TranscribedSentence;
+import com.bremenband.shadowengapi.domain.study.entity.Sentence;
 import com.bremenband.shadowengapi.domain.study.entity.SessionStatus;
 import com.bremenband.shadowengapi.domain.study.entity.StudySession;
+import com.bremenband.shadowengapi.domain.study.entity.Video;
+import com.bremenband.shadowengapi.domain.study.repository.SentenceRepository;
 import com.bremenband.shadowengapi.domain.study.repository.StudySessionRepository;
+import com.bremenband.shadowengapi.domain.study.repository.VideoRepository;
+import com.bremenband.shadowengapi.domain.user.entity.User;
+import com.bremenband.shadowengapi.domain.user.repository.UserRepository;
+import com.bremenband.shadowengapi.global.exception.CustomException;
+import com.bremenband.shadowengapi.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,6 +31,11 @@ import java.util.Optional;
 public class StudySessionService {
 
     private final StudySessionRepository studySessionRepository;
+    private final VideoRepository videoRepository;
+    private final SentenceRepository sentenceRepository;
+    private final UserRepository userRepository;
+    private final YoutubeService youtubeService;
+    private final TranscriptionService transcriptionService;
 
     public RecentStudySessionResponse getRecentSession(Long userId) {
         Optional<StudySession> sessionOpt = studySessionRepository
@@ -38,5 +56,82 @@ public class StudySessionService {
         );
 
         return new RecentStudySessionResponse(latestSession);
+    }
+
+    @Transactional
+    public StudySessionCreateResponse createStudySession(Long userId, StudySessionCreateRequest request) {
+        // 1. embedUrl에서 videoId 추출
+        String videoId = extractVideoId(request.embedUrl());
+
+        // 2. Video 조회 or YouTube API에서 가져와 저장
+        Video video = videoRepository.findById(videoId)
+                .orElseGet(() -> {
+                    VideoInfoResponse info = youtubeService.getVideo(request.embedUrl());
+                    return videoRepository.save(Video.builder()
+                            .videoId(info.videoId())
+                            .title(info.title())
+                            .embedUrl(info.embedUrl())
+                            .thumbnailUrl(info.thumbnailUrl())
+                            .duration((int) info.duration())
+                            .channelTitle(info.channelTitle())
+                            .build());
+                });
+
+        // 3. User 조회
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 4. StudySession 생성 및 저장
+        StudySession session = studySessionRepository.save(StudySession.builder()
+                .video(video)
+                .user(user)
+                .startSec(request.startSec())
+                .endSec(request.endSec())
+                .build());
+
+        // 5. 전사(STT) 수행
+        List<TranscribedSentence> transcriptions =
+                transcriptionService.transcribe(videoId, request.startSec(), request.endSec());
+
+        // 6. Sentence 저장
+        List<Sentence> sentences = transcriptions.stream()
+                .map(t -> sentenceRepository.save(Sentence.builder()
+                        .studySession(session)
+                        .content(t.content())
+                        .startSec(t.startSec())
+                        .endSec(t.endSec())
+                        .durationSec(t.durationSec())
+                        .wordTimestamps(t.wordTimestamps())
+                        .features(t.features())
+                        .build()))
+                .toList();
+
+        // 7. 응답 빌드
+        return new StudySessionCreateResponse(
+                session.getId(),
+                new StudySessionCreateResponse.VideoData(
+                        video.getVideoId(),
+                        video.getEmbedUrl(),
+                        video.getTitle(),
+                        video.getThumbnailUrl(),
+                        video.getDuration(),
+                        video.getChannelTitle()
+                ),
+                sentences.stream()
+                        .map(s -> new StudySessionCreateResponse.SentenceData(
+                                s.getId(),
+                                s.getContent(),
+                                s.getStartSec(),
+                                s.getEndSec(),
+                                s.getDurationSec(),
+                                0
+                        ))
+                        .toList()
+        );
+    }
+
+    // "https://www.youtube.com/embed/dQw4w9WgXcQ" → "dQw4w9WgXcQ"
+    private String extractVideoId(String embedUrl) {
+        return embedUrl.substring(embedUrl.lastIndexOf('/') + 1);
     }
 }
