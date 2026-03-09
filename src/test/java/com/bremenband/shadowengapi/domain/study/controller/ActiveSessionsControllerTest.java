@@ -3,6 +3,7 @@ package com.bremenband.shadowengapi.domain.study.controller;
 import com.bremenband.shadowengapi.domain.study.dto.res.ActiveSessionResponse;
 import com.bremenband.shadowengapi.domain.study.dto.res.ActiveSessionsResponse;
 import com.bremenband.shadowengapi.domain.study.dto.res.ThumbnailInfo;
+import com.bremenband.shadowengapi.domain.study.service.EvaluationService;
 import com.bremenband.shadowengapi.domain.study.service.StudySessionService;
 import com.bremenband.shadowengapi.global.config.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
@@ -33,8 +34,8 @@ class ActiveSessionsControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
-    private StudySessionService studySessionService;
+    @MockitoBean private StudySessionService studySessionService;
+    @MockitoBean private EvaluationService   evaluationService;
 
     private static final String VIDEO_ID = "dQw4w9WgXcQ";
     private static final String THUMBNAIL_URL =

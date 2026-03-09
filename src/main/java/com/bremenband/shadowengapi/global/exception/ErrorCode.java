@@ -12,11 +12,14 @@ public enum ErrorCode {
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, 1000, "올바르지 않은 요청입니다."),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, 1001, "입력값이 올바르지 않습니다."),
     INVALID_YOUTUBE_URL(HttpStatus.BAD_REQUEST, 1002, "올바르지 않은 유튜브 URL입니다."),
+    VOICE_RECOGNITION_FAILED(HttpStatus.BAD_REQUEST, 1003, "음성이 인식되지 않았습니다. 다시 녹음해주세요."),
 
     // [2000 ~] : DB 관련,
     DATA_NOT_FOUND(HttpStatus.NOT_FOUND, 2000, "조회된 데이터가 없습니다"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 2002, "사용자를 찾을 수 없습니다."),
     VIDEO_NOT_FOUND(HttpStatus.NOT_FOUND, 2003, "해당 영상을 찾을 수 없습니다."),
+    SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, 2004, "학습 세션을 찾을 수 없습니다."),
+    SENTENCE_NOT_FOUND(HttpStatus.NOT_FOUND, 2005, "문장을 찾을 수 없습니다."),
     CSV_FILE_LOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 2001, "서버의 데이터 파일을 읽어오는 데 실패했습니다"),
 
 

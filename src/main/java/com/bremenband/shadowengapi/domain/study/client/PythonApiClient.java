@@ -1,5 +1,7 @@
 package com.bremenband.shadowengapi.domain.study.client;
 
+import com.bremenband.shadowengapi.domain.study.dto.python.PythonEvaluateAudioRequest;
+import com.bremenband.shadowengapi.domain.study.dto.python.PythonEvaluateAudioResponse;
 import com.bremenband.shadowengapi.domain.study.dto.python.PythonGenerateReferenceRequest;
 import com.bremenband.shadowengapi.domain.study.dto.python.PythonGenerateReferenceResponse;
 import com.bremenband.shadowengapi.global.exception.CustomException;
@@ -29,6 +31,20 @@ public class PythonApiClient {
                     .bodyValue(request)
                     .retrieve()
                     .bodyToMono(PythonGenerateReferenceResponse.class)
+                    .block();
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.EXTERNAL_API_ERROR);
+        }
+    }
+
+    public PythonEvaluateAudioResponse evaluateAudio(PythonEvaluateAudioRequest request) {
+        try {
+            return webClient.post()
+                    .uri(baseUrl + "/api/v1/evaluate-audio")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(request)
+                    .retrieve()
+                    .bodyToMono(PythonEvaluateAudioResponse.class)
                     .block();
         } catch (Exception e) {
             throw new CustomException(ErrorCode.EXTERNAL_API_ERROR);

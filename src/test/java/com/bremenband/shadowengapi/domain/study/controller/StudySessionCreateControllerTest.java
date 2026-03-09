@@ -1,6 +1,7 @@
 package com.bremenband.shadowengapi.domain.study.controller;
 
 import com.bremenband.shadowengapi.domain.study.dto.res.StudySessionCreateResponse;
+import com.bremenband.shadowengapi.domain.study.service.EvaluationService;
 import com.bremenband.shadowengapi.domain.study.service.StudySessionService;
 import com.bremenband.shadowengapi.global.config.SecurityConfig;
 import com.bremenband.shadowengapi.global.exception.CustomException;
@@ -38,6 +39,7 @@ class StudySessionCreateControllerTest {
     @Autowired private ObjectMapper objectMapper;
 
     @MockitoBean private StudySessionService studySessionService;
+    @MockitoBean private EvaluationService   evaluationService;
 
     private static final String EMBED_URL = "https://www.youtube.com/embed/dQw4w9WgXcQ";
     private static final String VIDEO_ID  = "dQw4w9WgXcQ";

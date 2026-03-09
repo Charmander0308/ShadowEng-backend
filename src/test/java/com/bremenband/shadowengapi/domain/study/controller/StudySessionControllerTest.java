@@ -8,6 +8,7 @@ import com.bremenband.shadowengapi.domain.study.service.StudySessionService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.bremenband.shadowengapi.domain.study.service.EvaluationService;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import com.bremenband.shadowengapi.global.config.SecurityConfig;
@@ -34,8 +35,8 @@ class StudySessionControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
-    private StudySessionService studySessionService;
+    @MockitoBean private StudySessionService studySessionService;
+    @MockitoBean private EvaluationService   evaluationService;
 
     @Test
     @DisplayName("ACTIVE 세션이 존재하면 세션 정보와 썸네일을 담은 200 응답을 반환한다")

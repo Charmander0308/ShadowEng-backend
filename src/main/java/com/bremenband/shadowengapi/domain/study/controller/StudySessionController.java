@@ -2,9 +2,12 @@ package com.bremenband.shadowengapi.domain.study.controller;
 
 import com.bremenband.shadowengapi.domain.study.dto.req.StudySessionCreateRequest;
 import com.bremenband.shadowengapi.domain.study.dto.res.ActiveSessionsResponse;
+import com.bremenband.shadowengapi.domain.study.dto.res.EvaluationResponse;
 import com.bremenband.shadowengapi.domain.study.dto.res.RecentStudySessionResponse;
 import com.bremenband.shadowengapi.domain.study.dto.res.StudySessionCreateResponse;
+import com.bremenband.shadowengapi.domain.study.service.EvaluationService;
 import com.bremenband.shadowengapi.domain.study.service.StudySessionService;
+import org.springframework.web.multipart.MultipartFile;
 import com.bremenband.shadowengapi.global.common.ApiResponse;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class StudySessionController {
 
     private final StudySessionService studySessionService;
+    private final EvaluationService evaluationService;
 
     @GetMapping
     @Operation(
@@ -59,14 +63,18 @@ public class StudySessionController {
     @PostMapping("/{sessionId}/evaluations")
     @Operation(
             summary = "사용자의 음성 데이터 전송",
-            description = "특정 학습 세션에 대한 음성 데이터를 전송하고 평가를 요청합니다."
+            description = "녹음한 음성 파일과 평가 대상 문장 ID를 전달받아 Python AI 서버에서 발화를 분석하고 결과를 반환합니다."
     )
-    public ApiResponse<?> sendVoice(
-            @Parameter(description = "음성을 전송할 학습 세션의 고유 ID", example = "1234")
-            @PathVariable String sessionId
-            // 실제 음성 파일이나 데이터는 @RequestPart 또는 @RequestBody로 받을 수 있습니다.
+    public ApiResponse<EvaluationResponse> sendVoice(
+            @Parameter(description = "학습 세션 ID", example = "1234")
+            @PathVariable Long sessionId,
+            @Parameter(description = "평가 대상 문장 ID", example = "1234")
+            @RequestParam Long sentenceId,
+            @Parameter(description = "녹음된 음성 파일 (wav, m4a 등)")
+            @RequestParam("file") MultipartFile file,
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     ) {
-        return null;
+        return ApiResponse.success(evaluationService.evaluate(sessionId, sentenceId, file));
     }
 
     @GetMapping("/{sessionId}")
