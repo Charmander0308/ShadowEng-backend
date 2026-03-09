@@ -38,12 +38,12 @@ public class ReportController {
             summary = "학습 세션 레포트 조회",
             description = "특정 학습 세션의 레포트를 조회합니다."
     )
-    public ApiResponse<?> getSessionReport(
+    public ApiResponse<ReportResponse> getSessionReport(
             @Parameter(description = "조회할 학습 세션 ID", example = "12345")
             @PathVariable Long sessionId,
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     ) {
-        return null;
+        return ApiResponse.success(reportService.getReport(sessionId));
     }
 
     @GetMapping("/reports/daily")

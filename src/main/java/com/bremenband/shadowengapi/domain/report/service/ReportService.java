@@ -105,6 +105,33 @@ public class ReportService {
                 difficultSentences);
     }
 
+    @Transactional(readOnly = true)
+    public ReportResponse getReport(Long sessionId) {
+        Report report = reportRepository.findByStudySession_Id(sessionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.REPORT_NOT_FOUND));
+
+        List<WeekSentence> weekSentences = weekSentenceRepository.findByReport_Id(report.getId());
+
+        List<ReportResponse.DifficultSentence> difficultSentences = weekSentences.stream()
+                .map(ws -> new ReportResponse.DifficultSentence(
+                        ws.getSentence().getId(),
+                        ws.getSentence().getContent()))
+                .toList();
+
+        return new ReportResponse(
+                sessionId,
+                new ReportResponse.Scores(
+                        report.getTotalScore().doubleValue(),
+                        report.getWordAccuracy().doubleValue(),
+                        report.getProsodyAndStress().doubleValue(),
+                        report.getWordRhythmScore().doubleValue(),
+                        report.getBoundaryToneScore().doubleValue(),
+                        report.getDynamicStressScore().doubleValue(),
+                        report.getSpeedSimilarity().doubleValue(),
+                        report.getPauseSimilarity().doubleValue()),
+                difficultSentences);
+    }
+
     // ── 헬퍼 ────────────────────────────────────────────────────────────────────
 
     private double avg(List<Evaluation> evaluations, java.util.function.ToDoubleFunction<Evaluation> mapper) {
