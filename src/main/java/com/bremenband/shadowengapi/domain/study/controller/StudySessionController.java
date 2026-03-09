@@ -1,6 +1,7 @@
 package com.bremenband.shadowengapi.domain.study.controller;
 
 import com.bremenband.shadowengapi.domain.study.dto.req.StudySessionCreateRequest;
+import com.bremenband.shadowengapi.domain.study.dto.res.ActiveSessionsResponse;
 import com.bremenband.shadowengapi.domain.study.dto.res.RecentStudySessionResponse;
 import com.bremenband.shadowengapi.domain.study.dto.res.StudySessionCreateResponse;
 import com.bremenband.shadowengapi.domain.study.service.StudySessionService;
@@ -26,10 +27,10 @@ public class StudySessionController {
             summary = "사용자가 학습 중인 세션 목록 조회",
             description = "요청 헤더의 Access Token을 통해 인증된 사용자의 학습 중 세션 전체 목록을 조회합니다."
     )
-    public ApiResponse<?> getStudySessions(
+    public ApiResponse<ActiveSessionsResponse> getStudySessions(
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     ) {
-        return null;
+        return ApiResponse.success(studySessionService.getActiveSessions(userId));
     }
 
     @PostMapping

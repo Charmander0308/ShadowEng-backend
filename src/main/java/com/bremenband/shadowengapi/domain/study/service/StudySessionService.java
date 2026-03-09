@@ -1,9 +1,12 @@
 package com.bremenband.shadowengapi.domain.study.service;
 
 import com.bremenband.shadowengapi.domain.study.dto.req.StudySessionCreateRequest;
+import com.bremenband.shadowengapi.domain.study.dto.res.ActiveSessionResponse;
+import com.bremenband.shadowengapi.domain.study.dto.res.ActiveSessionsResponse;
 import com.bremenband.shadowengapi.domain.study.dto.res.LatestActiveSessionResponse;
 import com.bremenband.shadowengapi.domain.study.dto.res.RecentStudySessionResponse;
 import com.bremenband.shadowengapi.domain.study.dto.res.StudySessionCreateResponse;
+import com.bremenband.shadowengapi.domain.study.dto.res.ThumbnailInfo;
 import com.bremenband.shadowengapi.domain.study.dto.res.ThumbnailsResponse;
 import com.bremenband.shadowengapi.domain.study.dto.res.VideoInfoResponse;
 import com.bremenband.shadowengapi.domain.study.dto.transcription.TranscribedSentence;
@@ -36,6 +39,22 @@ public class StudySessionService {
     private final UserRepository userRepository;
     private final YoutubeService youtubeService;
     private final TranscriptionService transcriptionService;
+
+    public ActiveSessionsResponse getActiveSessions(Long userId) {
+        List<StudySession> sessions = studySessionRepository
+                .findByUser_IdAndStatusOrderByCreatedAtDesc(userId, SessionStatus.ACTIVE);
+
+        List<ActiveSessionResponse> list = sessions.stream()
+                .map(session -> {
+                    String videoId = session.getVideo().getVideoId();
+                    ThumbnailInfo thumbnail = new ThumbnailInfo(
+                            "https://i.ytimg.com/vi/" + videoId + "/sddefault.jpg", 640, 480);
+                    return new ActiveSessionResponse(session.getId(), thumbnail, session.getProgressRate());
+                })
+                .toList();
+
+        return new ActiveSessionsResponse(list);
+    }
 
     public RecentStudySessionResponse getRecentSession(Long userId) {
         Optional<StudySession> sessionOpt = studySessionRepository
