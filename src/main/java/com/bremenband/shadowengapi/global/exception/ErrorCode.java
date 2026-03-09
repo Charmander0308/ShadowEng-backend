@@ -20,6 +20,8 @@ public enum ErrorCode {
     VIDEO_NOT_FOUND(HttpStatus.NOT_FOUND, 2003, "해당 영상을 찾을 수 없습니다."),
     SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, 2004, "학습 세션을 찾을 수 없습니다."),
     SENTENCE_NOT_FOUND(HttpStatus.NOT_FOUND, 2005, "문장을 찾을 수 없습니다."),
+    REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, 2006, "리포트를 찾을 수 없습니다."),
+    NO_EVALUATIONS_FOR_REPORT(HttpStatus.BAD_REQUEST, 1004, "평가 결과가 없어 리포트를 생성할 수 없습니다."),
     CSV_FILE_LOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 2001, "서버의 데이터 파일을 읽어오는 데 실패했습니다"),
 
 
