@@ -45,3 +45,6 @@ Thumbs.db
 
 ### Secrets ###
 .env
+
+### Prompt ###
+prompt.md

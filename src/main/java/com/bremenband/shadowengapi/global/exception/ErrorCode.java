@@ -14,6 +14,7 @@ public enum ErrorCode {
 
     // [2000 ~] : DB 관련,
     DATA_NOT_FOUND(HttpStatus.NOT_FOUND, 2000, "조회된 데이터가 없습니다"),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, 2002, "사용자를 찾을 수 없습니다."),
     CSV_FILE_LOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 2001, "서버의 데이터 파일을 읽어오는 데 실패했습니다"),
 
 
