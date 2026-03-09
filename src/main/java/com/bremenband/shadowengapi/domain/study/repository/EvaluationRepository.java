@@ -10,4 +10,6 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
     long countBySentence_Id(Long sentenceId);
 
     List<Evaluation> findByStudySession_Id(Long sessionId);
+
+    List<Evaluation> findByStudySession_User_IdOrderByCreatedAtAsc(Long userId);
 }

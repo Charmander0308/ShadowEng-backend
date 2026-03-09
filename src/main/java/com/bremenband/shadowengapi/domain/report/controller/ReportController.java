@@ -1,5 +1,6 @@
 package com.bremenband.shadowengapi.domain.report.controller;
 
+import com.bremenband.shadowengapi.domain.report.dto.res.DailyReportResponse;
 import com.bremenband.shadowengapi.domain.report.dto.res.ReportResponse;
 import com.bremenband.shadowengapi.domain.report.service.ReportService;
 import com.bremenband.shadowengapi.domain.study.dto.req.ReportCreateRequest;
