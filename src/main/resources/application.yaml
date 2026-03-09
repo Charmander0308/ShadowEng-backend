@@ -28,6 +28,11 @@ spring:
       port: 6379
       password: ${REDIS_PWD}
 
+youtube:
+  api:
+    key: ${YOUTUBE_API_KEY}
+    base-url: https://www.googleapis.com/youtube/v3
+
 logging:
   level:
     org.hibernate.SQL: debug

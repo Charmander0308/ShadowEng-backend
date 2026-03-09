@@ -11,10 +11,12 @@ public enum ErrorCode {
     // [1000 ~] : 공통 에러
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, 1000, "올바르지 않은 요청입니다."),
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, 1001, "입력값이 올바르지 않습니다."),
+    INVALID_YOUTUBE_URL(HttpStatus.BAD_REQUEST, 1002, "올바르지 않은 유튜브 URL입니다."),
 
     // [2000 ~] : DB 관련,
     DATA_NOT_FOUND(HttpStatus.NOT_FOUND, 2000, "조회된 데이터가 없습니다"),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 2002, "사용자를 찾을 수 없습니다."),
+    VIDEO_NOT_FOUND(HttpStatus.NOT_FOUND, 2003, "해당 영상을 찾을 수 없습니다."),
     CSV_FILE_LOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 2001, "서버의 데이터 파일을 읽어오는 데 실패했습니다"),
 
 
