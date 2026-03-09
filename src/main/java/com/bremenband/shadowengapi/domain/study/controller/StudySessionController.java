@@ -1,5 +1,7 @@
 package com.bremenband.shadowengapi.domain.study.controller;
 
+import com.bremenband.shadowengapi.domain.study.dto.res.RecentStudySessionResponse;
+import com.bremenband.shadowengapi.domain.study.service.StudySessionService;
 import com.bremenband.shadowengapi.global.common.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(name = "학습세션 API", description = "학습 세션 관련 기능을 위한 REST API")
 public class StudySessionController {
+
+    private final StudySessionService studySessionService;
 
     @GetMapping
     @Operation(
@@ -42,10 +46,10 @@ public class StudySessionController {
             summary = "최근 학습 세션 조회",
             description = "인증된 사용자의 가장 최근 학습 세션 정보를 조회합니다."
     )
-    public ApiResponse<?> getRecentSession(
+    public ApiResponse<RecentStudySessionResponse> getRecentSession(
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     ) {
-        return null;
+        return ApiResponse.success(studySessionService.getRecentSession(userId));
     }
 
     @PostMapping("/{sessionId}/evaluations")
