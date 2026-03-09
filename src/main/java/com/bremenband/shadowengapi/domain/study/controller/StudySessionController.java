@@ -79,14 +79,15 @@ public class StudySessionController {
 
     @GetMapping("/{sessionId}")
     @Operation(
-            summary = "단일 학습 세션 조회",
-            description = "특정 학습 세션의 상세 정보를 조회합니다."
+            summary = "단일 학습 세션 세부 조회",
+            description = "세션 ID로 학습 세션의 영상 정보와 문장 목록(학습 횟수 포함)을 조회합니다."
     )
-    public ApiResponse<?> getStudySession(
+    public ApiResponse<StudySessionCreateResponse> getStudySession(
             @Parameter(description = "조회할 학습 세션의 고유 ID", example = "1234")
-            @PathVariable String sessionId
+            @PathVariable Long sessionId,
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     ) {
-        return null;
+        return ApiResponse.success(studySessionService.getStudySession(sessionId));
     }
 
 

@@ -14,6 +14,7 @@ import com.bremenband.shadowengapi.domain.study.entity.Sentence;
 import com.bremenband.shadowengapi.domain.study.entity.SessionStatus;
 import com.bremenband.shadowengapi.domain.study.entity.StudySession;
 import com.bremenband.shadowengapi.domain.study.entity.Video;
+import com.bremenband.shadowengapi.domain.study.repository.EvaluationRepository;
 import com.bremenband.shadowengapi.domain.study.repository.SentenceRepository;
 import com.bremenband.shadowengapi.domain.study.repository.StudySessionRepository;
 import com.bremenband.shadowengapi.domain.study.repository.VideoRepository;
@@ -36,6 +37,7 @@ public class StudySessionService {
     private final StudySessionRepository studySessionRepository;
     private final VideoRepository videoRepository;
     private final SentenceRepository sentenceRepository;
+    private final EvaluationRepository evaluationRepository;
     private final UserRepository userRepository;
     private final YoutubeService youtubeService;
     private final TranscriptionService transcriptionService;
@@ -54,6 +56,38 @@ public class StudySessionService {
                 .toList();
 
         return new ActiveSessionsResponse(list);
+    }
+
+    public StudySessionCreateResponse getStudySession(Long sessionId) {
+        StudySession session = studySessionRepository.findById(sessionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SESSION_NOT_FOUND));
+
+        Video video = session.getVideo();
+        List<Sentence> sentences = sentenceRepository.findByStudySession_Id(sessionId);
+
+        List<StudySessionCreateResponse.SentenceData> sentencesData = sentences.stream()
+                .map(s -> new StudySessionCreateResponse.SentenceData(
+                        s.getId(),
+                        s.getContent(),
+                        s.getStartSec(),
+                        s.getEndSec(),
+                        s.getDurationSec(),
+                        (int) evaluationRepository.countBySentence_Id(s.getId())
+                ))
+                .toList();
+
+        return new StudySessionCreateResponse(
+                session.getId(),
+                new StudySessionCreateResponse.VideoData(
+                        video.getVideoId(),
+                        video.getEmbedUrl(),
+                        video.getTitle(),
+                        video.getThumbnailUrl(),
+                        video.getDuration(),
+                        video.getChannelTitle()
+                ),
+                sentencesData
+        );
     }
 
     public RecentStudySessionResponse getRecentSession(Long userId) {
