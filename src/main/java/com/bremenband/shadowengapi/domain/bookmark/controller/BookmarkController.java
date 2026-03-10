@@ -1,5 +1,7 @@
 package com.bremenband.shadowengapi.domain.bookmark.controller;
 
+import com.bremenband.shadowengapi.domain.bookmark.dto.res.BookmarkListResponse;
+import com.bremenband.shadowengapi.domain.bookmark.service.BookmarkService;
 import com.bremenband.shadowengapi.global.common.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,15 +18,17 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "북마크 API", description = "북마크 관련 기능을 위한 REST API")
 public class BookmarkController {
 
+    private final BookmarkService bookmarkService;
+
     @GetMapping("/bookmarks")
     @Operation(
             summary = "사용자의 북마크 목록 전체 조회",
             description = "요청 헤더의 Access Token을 통해 인증된 사용자가 북마크한 문장 목록을 조회합니다."
     )
-    public ApiResponse<?> getBookmarks(
+    public ApiResponse<BookmarkListResponse> getBookmarks(
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     ) {
-        return null;
+        return ApiResponse.success(bookmarkService.getBookmarks(userId));
     }
 
     @PatchMapping("/sentences/{sentenceId}")
