@@ -52,9 +52,9 @@ public class ReportController {
             summary = "데일리 학습 리포트 조회",
             description = "인증된 사용자의 일자별 학습 데이터를 조회합니다."
     )
-    public ApiResponse<?> getDailyReport(
+    public ApiResponse<DailyReportResponse> getDailyReport(
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     ) {
-        return null;
+        return ApiResponse.success(reportService.getDailyReport(userId));
     }
 }
