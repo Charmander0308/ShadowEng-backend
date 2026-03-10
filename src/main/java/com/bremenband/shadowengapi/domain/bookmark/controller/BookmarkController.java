@@ -1,17 +1,18 @@
 package com.bremenband.shadowengapi.domain.bookmark.controller;
 
+import com.bremenband.shadowengapi.domain.bookmark.dto.req.BookmarkUpdateRequest;
 import com.bremenband.shadowengapi.domain.bookmark.dto.res.BookmarkListResponse;
+import com.bremenband.shadowengapi.domain.bookmark.dto.res.BookmarkUpdateResponse;
 import com.bremenband.shadowengapi.domain.bookmark.service.BookmarkService;
 import com.bremenband.shadowengapi.global.common.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -36,11 +37,13 @@ public class BookmarkController {
             summary = "문장 북마크 상태 변경",
             description = "특정 문장의 북마크 상태를 변경(추가 또는 해제)합니다."
     )
-    public ApiResponse<?> updateBookmark(
+    public ApiResponse<BookmarkUpdateResponse> updateBookmark(
             @Parameter(description = "북마크 상태를 변경할 문장의 고유 ID", example = "123")
-            @PathVariable String sentenceId
+            @PathVariable Long sentenceId,
+            @Valid @RequestBody BookmarkUpdateRequest request,
+            @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     ) {
-        return null;
+        return ApiResponse.success(bookmarkService.updateBookmark(userId, sentenceId, request.isBookmarked()));
     }
 
 }

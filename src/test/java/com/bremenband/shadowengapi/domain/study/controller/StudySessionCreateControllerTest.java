@@ -4,6 +4,7 @@ import com.bremenband.shadowengapi.domain.study.dto.res.StudySessionCreateRespon
 import com.bremenband.shadowengapi.domain.study.service.EvaluationService;
 import com.bremenband.shadowengapi.domain.study.service.StudySessionService;
 import com.bremenband.shadowengapi.global.config.SecurityConfig;
+import com.bremenband.shadowengapi.global.jwt.JwtProvider;
 import com.bremenband.shadowengapi.global.exception.CustomException;
 import com.bremenband.shadowengapi.global.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(StudySessionController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JwtProvider.class})
 class StudySessionCreateControllerTest {
 
     @Autowired private MockMvc mockMvc;

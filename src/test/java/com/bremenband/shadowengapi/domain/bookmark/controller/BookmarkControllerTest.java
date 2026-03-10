@@ -3,6 +3,7 @@ package com.bremenband.shadowengapi.domain.bookmark.controller;
 import com.bremenband.shadowengapi.domain.bookmark.dto.res.BookmarkListResponse;
 import com.bremenband.shadowengapi.domain.bookmark.service.BookmarkService;
 import com.bremenband.shadowengapi.global.config.SecurityConfig;
+import com.bremenband.shadowengapi.global.jwt.JwtProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BookmarkController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JwtProvider.class})
 class BookmarkControllerTest {
 
     @Autowired private MockMvc mockMvc;

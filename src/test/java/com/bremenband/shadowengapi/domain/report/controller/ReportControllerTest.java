@@ -3,6 +3,7 @@ package com.bremenband.shadowengapi.domain.report.controller;
 import com.bremenband.shadowengapi.domain.report.dto.res.ReportResponse;
 import com.bremenband.shadowengapi.domain.report.service.ReportService;
 import com.bremenband.shadowengapi.global.config.SecurityConfig;
+import com.bremenband.shadowengapi.global.jwt.JwtProvider;
 import com.bremenband.shadowengapi.global.exception.CustomException;
 import com.bremenband.shadowengapi.global.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ReportController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JwtProvider.class})
 class ReportControllerTest {
 
     @Autowired private MockMvc       mockMvc;

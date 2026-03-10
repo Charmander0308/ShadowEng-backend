@@ -4,6 +4,7 @@ import com.bremenband.shadowengapi.domain.study.dto.res.EvaluationResponse;
 import com.bremenband.shadowengapi.domain.study.service.EvaluationService;
 import com.bremenband.shadowengapi.domain.study.service.StudySessionService;
 import com.bremenband.shadowengapi.global.config.SecurityConfig;
+import com.bremenband.shadowengapi.global.jwt.JwtProvider;
 import com.bremenband.shadowengapi.global.exception.CustomException;
 import com.bremenband.shadowengapi.global.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(StudySessionController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JwtProvider.class})
 class EvaluationControllerTest {
 
     @Autowired private MockMvc mockMvc;

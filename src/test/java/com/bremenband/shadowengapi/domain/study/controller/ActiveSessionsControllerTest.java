@@ -6,6 +6,7 @@ import com.bremenband.shadowengapi.domain.study.dto.res.ThumbnailInfo;
 import com.bremenband.shadowengapi.domain.study.service.EvaluationService;
 import com.bremenband.shadowengapi.domain.study.service.StudySessionService;
 import com.bremenband.shadowengapi.global.config.SecurityConfig;
+import com.bremenband.shadowengapi.global.jwt.JwtProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(StudySessionController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JwtProvider.class})
 class ActiveSessionsControllerTest {
 
     @Autowired
