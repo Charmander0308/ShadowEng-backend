@@ -54,6 +54,8 @@ db/
 *.p12
 *.jks
 *.keystore
+application-secret*.yaml
+application-secret*.properties
 
 ### Local config overrides ###
 application-local*.yaml
