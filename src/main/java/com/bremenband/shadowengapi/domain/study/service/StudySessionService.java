@@ -194,8 +194,10 @@ public class StudySessionService {
         );
     }
 
-    // "https://www.youtube.com/embed/dQw4w9WgXcQ" → "dQw4w9WgXcQ"
+    // "https://www.youtube.com/embed/dQw4w9WgXcQ?start=10" → "dQw4w9WgXcQ"
     private String extractVideoId(String embedUrl) {
-        return embedUrl.substring(embedUrl.lastIndexOf('/') + 1);
+        String path = embedUrl.substring(embedUrl.lastIndexOf('/') + 1);
+        int queryIndex = path.indexOf('?');
+        return queryIndex == -1 ? path : path.substring(0, queryIndex);
     }
 }
