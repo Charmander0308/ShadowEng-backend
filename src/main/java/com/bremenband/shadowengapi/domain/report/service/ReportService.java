@@ -1,5 +1,6 @@
 package com.bremenband.shadowengapi.domain.report.service;
 
+import com.bremenband.shadowengapi.domain.report.dto.res.DailyReportResponse;
 import com.bremenband.shadowengapi.domain.report.dto.res.ReportResponse;
 import com.bremenband.shadowengapi.domain.report.entity.Report;
 import com.bremenband.shadowengapi.domain.report.entity.WeekSentence;
@@ -18,8 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -103,6 +106,27 @@ public class ReportService {
                         round(avgRhythm), round(avgBoundary), round(avgDynamic),
                         round(avgSpeed), round(avgPause)),
                 difficultSentences);
+    }
+
+    @Transactional(readOnly = true)
+    public DailyReportResponse getDailyReport(Long userId) {
+        List<Evaluation> evaluations =
+                evaluationRepository.findByStudySession_User_IdOrderByCreatedAtAsc(userId);
+
+        Map<LocalDate, Long> countByDate = evaluations.stream()
+                .collect(Collectors.groupingBy(
+                        e -> e.getCreatedAt().toLocalDate(),
+                        TreeMap::new,
+                        Collectors.counting()
+                ));
+
+        List<DailyReportResponse.StudyDayData> studyData = countByDate.entrySet().stream()
+                .map(entry -> new DailyReportResponse.StudyDayData(
+                        entry.getKey().toString(),
+                        entry.getValue().intValue()))
+                .toList();
+
+        return new DailyReportResponse(studyData);
     }
 
     @Transactional(readOnly = true)
