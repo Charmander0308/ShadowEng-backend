@@ -27,7 +27,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -58,12 +60,21 @@ public class StudySessionService {
         return new ActiveSessionsResponse(list);
     }
 
-    public StudySessionCreateResponse getStudySession(Long sessionId) {
+    public StudySessionCreateResponse getStudySession(Long sessionId, Long userId) {
         StudySession session = studySessionRepository.findById(sessionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.SESSION_NOT_FOUND));
 
+        if (!session.getUser().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
         Video video = session.getVideo();
         List<Sentence> sentences = sentenceRepository.findByStudySession_Id(sessionId);
+
+        // 문장별 평가 횟수를 한 번의 쿼리로 집계
+        Map<Long, Long> evalCountMap = evaluationRepository.findByStudySession_Id(sessionId)
+                .stream()
+                .collect(Collectors.groupingBy(e -> e.getSentence().getId(), Collectors.counting()));
 
         List<StudySessionCreateResponse.SentenceData> sentencesData = sentences.stream()
                 .map(s -> new StudySessionCreateResponse.SentenceData(
@@ -72,7 +83,7 @@ public class StudySessionService {
                         s.getStartSec(),
                         s.getEndSec(),
                         s.getDurationSec(),
-                        (int) evaluationRepository.countBySentence_Id(s.getId())
+                        evalCountMap.getOrDefault(s.getId(), 0L).intValue()
                 ))
                 .toList();
 

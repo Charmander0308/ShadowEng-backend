@@ -48,6 +48,8 @@ class EvaluationServiceTest {
     @Mock private PythonApiClient pythonApiClient;
     @Spy  private ObjectMapper objectMapper;
 
+    private static final Long USER_ID = 1L;
+
     // ── 헬퍼 ────────────────────────────────────────────────────────────────────
 
     private StudySession buildSession(Long sessionId) {
@@ -56,6 +58,7 @@ class EvaluationServiceTest {
                 .thumbnailUrl("thumb").duration(212).channelTitle("Ch").build();
         User user = User.builder()
                 .email("u@e.com").nickname("nick").provider("KAKAO").providerId("p1").build();
+        ReflectionTestUtils.setField(user, "id", USER_ID);
         StudySession session = StudySession.builder()
                 .video(video).user(user).startSec(0.0).endSec(60.0).build();
         ReflectionTestUtils.setField(session, "id", sessionId);
@@ -110,7 +113,7 @@ class EvaluationServiceTest {
                 "file", "test.wav", "audio/wav", "audio-bytes".getBytes());
 
         // when
-        EvaluationResponse response = evaluationService.evaluate(sessionId, sentenceId, audio);
+        EvaluationResponse response = evaluationService.evaluate(sessionId, sentenceId, audio, USER_ID);
 
         // then
         assertThat(response.sentenceId()).isEqualTo(sentenceId);
@@ -147,7 +150,7 @@ class EvaluationServiceTest {
         given(studySessionRepository.findById(sessionId)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> evaluationService.evaluate(sessionId, sentenceId, audio))
+        assertThatThrownBy(() -> evaluationService.evaluate(sessionId, sentenceId, audio, USER_ID))
                 .isInstanceOf(CustomException.class)
                 .extracting("errorCode").isEqualTo(ErrorCode.SESSION_NOT_FOUND);
 
@@ -167,7 +170,7 @@ class EvaluationServiceTest {
         given(sentenceRepository.findById(sentenceId)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> evaluationService.evaluate(sessionId, sentenceId, audio))
+        assertThatThrownBy(() -> evaluationService.evaluate(sessionId, sentenceId, audio, USER_ID))
                 .isInstanceOf(CustomException.class)
                 .extracting("errorCode").isEqualTo(ErrorCode.SENTENCE_NOT_FOUND);
     }
@@ -190,7 +193,7 @@ class EvaluationServiceTest {
                         "음성이 인식되지 않았습니다. 다시 녹음해주세요.", null, null, null));
 
         // when & then
-        assertThatThrownBy(() -> evaluationService.evaluate(sessionId, sentenceId, audio))
+        assertThatThrownBy(() -> evaluationService.evaluate(sessionId, sentenceId, audio, USER_ID))
                 .isInstanceOf(CustomException.class)
                 .extracting("errorCode").isEqualTo(ErrorCode.VOICE_RECOGNITION_FAILED);
 
@@ -215,7 +218,7 @@ class EvaluationServiceTest {
         given(sentenceRepository.findById(sentenceId)).willReturn(Optional.of(sentence));
 
         // when & then
-        assertThatThrownBy(() -> evaluationService.evaluate(sessionId, sentenceId, audio))
+        assertThatThrownBy(() -> evaluationService.evaluate(sessionId, sentenceId, audio, USER_ID))
                 .isInstanceOf(CustomException.class)
                 .extracting("errorCode").isEqualTo(ErrorCode.INVALID_REQUEST);
     }

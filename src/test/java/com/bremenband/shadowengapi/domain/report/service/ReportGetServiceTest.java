@@ -43,6 +43,8 @@ class ReportGetServiceTest {
     @Mock private ReportRepository       reportRepository;
     @Mock private WeekSentenceRepository weekSentenceRepository;
 
+    private static final Long USER_ID = 1L;
+
     // ── 헬퍼 ────────────────────────────────────────────────────────────────────
 
     private StudySession buildSession(Long sessionId) {
@@ -51,6 +53,7 @@ class ReportGetServiceTest {
                 .thumbnailUrl("th").duration(212).channelTitle("Ch").build();
         User user = User.builder()
                 .email("u@e.com").nickname("nick").provider("KAKAO").providerId("p").build();
+        ReflectionTestUtils.setField(user, "id", USER_ID);
         StudySession session = StudySession.builder()
                 .video(video).user(user).startSec(0).endSec(60).build();
         ReflectionTestUtils.setField(session, "id", sessionId);
@@ -100,7 +103,7 @@ class ReportGetServiceTest {
         given(weekSentenceRepository.findByReport_Id(reportId)).willReturn(List.of(ws));
 
         // when
-        ReportResponse response = reportService.getReport(sessionId);
+        ReportResponse response = reportService.getReport(sessionId, USER_ID);
 
         // then
         assertThat(response.sessionId()).isEqualTo(sessionId);
@@ -135,7 +138,7 @@ class ReportGetServiceTest {
         given(weekSentenceRepository.findByReport_Id(reportId)).willReturn(List.of());
 
         // when
-        ReportResponse response = reportService.getReport(sessionId);
+        ReportResponse response = reportService.getReport(sessionId, USER_ID);
 
         // then
         assertThat(response.difficultSentences()).isEmpty();
@@ -149,7 +152,7 @@ class ReportGetServiceTest {
         given(reportRepository.findByStudySession_Id(sessionId)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> reportService.getReport(sessionId))
+        assertThatThrownBy(() -> reportService.getReport(sessionId, USER_ID))
                 .isInstanceOf(CustomException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.REPORT_NOT_FOUND);

@@ -25,6 +25,12 @@ public enum ErrorCode {
     CSV_FILE_LOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 2001, "서버의 데이터 파일을 읽어오는 데 실패했습니다"),
 
 
+    // [3000 ~] : 인증/토큰 에러
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, 3000, "유효하지 않은 토큰입니다."),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, 3001, "만료된 토큰입니다."),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, 3002, "리프레시 토큰이 올바르지 않습니다."),
+    FORBIDDEN(HttpStatus.FORBIDDEN, 4001, "접근 권한이 없습니다."),
+
     // [9000 ~] : 시스템/서버 에러
     EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 9000, "외부 API 연동 중 오류가 발생했습니다."),
     DATA_CONVERSION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 9001, "데이터 변환 중 오류가 발생했습니다."),

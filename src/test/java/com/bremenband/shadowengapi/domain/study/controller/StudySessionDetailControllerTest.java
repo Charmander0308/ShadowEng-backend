@@ -19,6 +19,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
@@ -61,7 +63,7 @@ class StudySessionDetailControllerTest {
         StudySessionCreateResponse response =
                 new StudySessionCreateResponse(sessionId, videoData, sentencesData);
 
-        given(studySessionService.getStudySession(sessionId)).willReturn(response);
+        given(studySessionService.getStudySession(eq(sessionId), any())).willReturn(response);
 
         // when & then
         mockMvc.perform(get("/study-sessions/{sessionId}", sessionId)
@@ -87,7 +89,7 @@ class StudySessionDetailControllerTest {
                 .andExpect(jsonPath("$.data.sentencesData[1].sentenceId").value(11))
                 .andExpect(jsonPath("$.data.sentencesData[1].studyCount").value(0));
 
-        then(studySessionService).should(times(1)).getStudySession(sessionId);
+        then(studySessionService).should(times(1)).getStudySession(eq(sessionId), any());
     }
 
     @Test
@@ -101,7 +103,7 @@ class StudySessionDetailControllerTest {
         StudySessionCreateResponse response =
                 new StudySessionCreateResponse(sessionId, videoData, List.of());
 
-        given(studySessionService.getStudySession(sessionId)).willReturn(response);
+        given(studySessionService.getStudySession(eq(sessionId), any())).willReturn(response);
 
         // when & then
         mockMvc.perform(get("/study-sessions/{sessionId}", sessionId)
@@ -121,7 +123,7 @@ class StudySessionDetailControllerTest {
         // given
         Long sessionId = 999L;
 
-        given(studySessionService.getStudySession(sessionId))
+        given(studySessionService.getStudySession(eq(sessionId), any()))
                 .willThrow(new CustomException(ErrorCode.SESSION_NOT_FOUND));
 
         // when & then
@@ -136,6 +138,6 @@ class StudySessionDetailControllerTest {
                 .andExpect(jsonPath("$.code").value(ErrorCode.SESSION_NOT_FOUND.getCode()))
                 .andExpect(jsonPath("$.message").value(ErrorCode.SESSION_NOT_FOUND.getMessage()));
 
-        then(studySessionService).should(times(1)).getStudySession(sessionId);
+        then(studySessionService).should(times(1)).getStudySession(eq(sessionId), any());
     }
 }

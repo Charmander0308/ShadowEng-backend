@@ -18,6 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
@@ -47,7 +49,7 @@ class ReportGetControllerTest {
                 List.of(new ReportResponse.DifficultSentence(10L, "I got it bad."))
         );
 
-        given(reportService.getReport(sessionId)).willReturn(response);
+        given(reportService.getReport(eq(sessionId), any())).willReturn(response);
 
         // when & then
         mockMvc.perform(get("/study-sessions/{sessionId}/reports", sessionId)
@@ -73,7 +75,7 @@ class ReportGetControllerTest {
                 .andExpect(jsonPath("$.data.difficultSentences[0].sentenceId").value(10))
                 .andExpect(jsonPath("$.data.difficultSentences[0].sentence").value("I got it bad."));
 
-        then(reportService).should(times(1)).getReport(sessionId);
+        then(reportService).should(times(1)).getReport(eq(sessionId), any());
     }
 
     @Test
@@ -88,7 +90,7 @@ class ReportGetControllerTest {
                 List.of()
         );
 
-        given(reportService.getReport(sessionId)).willReturn(response);
+        given(reportService.getReport(eq(sessionId), any())).willReturn(response);
 
         // when & then
         mockMvc.perform(get("/study-sessions/{sessionId}/reports", sessionId)
@@ -108,7 +110,7 @@ class ReportGetControllerTest {
         // given
         Long sessionId = 999L;
 
-        given(reportService.getReport(sessionId))
+        given(reportService.getReport(eq(sessionId), any()))
                 .willThrow(new CustomException(ErrorCode.REPORT_NOT_FOUND));
 
         // when & then
@@ -123,6 +125,6 @@ class ReportGetControllerTest {
                 .andExpect(jsonPath("$.code").value(ErrorCode.REPORT_NOT_FOUND.getCode()))
                 .andExpect(jsonPath("$.message").value(ErrorCode.REPORT_NOT_FOUND.getMessage()));
 
-        then(reportService).should(times(1)).getReport(sessionId);
+        then(reportService).should(times(1)).getReport(eq(sessionId), any());
     }
 }

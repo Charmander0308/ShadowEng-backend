@@ -34,12 +34,17 @@ public class EvaluationService {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public EvaluationResponse evaluate(Long sessionId, Long sentenceId, MultipartFile audioFile) {
+    public EvaluationResponse evaluate(Long sessionId, Long sentenceId, MultipartFile audioFile, Long userId) {
         // 1. 세션 조회
         StudySession session = studySessionRepository.findById(sessionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.SESSION_NOT_FOUND));
 
-        // 2. 문장 조회 및 세션 소속 검증
+        // 2. 세션 소유권 검증
+        if (!session.getUser().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
+        // 3. 문장 조회 및 세션 소속 검증
         Sentence sentence = sentenceRepository.findById(sentenceId)
                 .orElseThrow(() -> new CustomException(ErrorCode.SENTENCE_NOT_FOUND));
 

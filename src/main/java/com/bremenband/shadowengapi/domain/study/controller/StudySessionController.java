@@ -74,7 +74,7 @@ public class StudySessionController {
             @RequestParam("file") MultipartFile file,
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     ) {
-        return ApiResponse.success(evaluationService.evaluate(sessionId, sentenceId, file));
+        return ApiResponse.success(evaluationService.evaluate(sessionId, sentenceId, file, userId));
     }
 
     @GetMapping("/{sessionId}")
@@ -87,7 +87,7 @@ public class StudySessionController {
             @PathVariable Long sessionId,
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     ) {
-        return ApiResponse.success(studySessionService.getStudySession(sessionId));
+        return ApiResponse.success(studySessionService.getStudySession(sessionId, userId));
     }
 
 

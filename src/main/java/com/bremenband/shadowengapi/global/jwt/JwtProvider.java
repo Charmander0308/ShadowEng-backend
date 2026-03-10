@@ -16,6 +16,10 @@ import java.util.Date;
 @Component
 public class JwtProvider {
 
+    private static final String TOKEN_TYPE_CLAIM = "type";
+    private static final String ACCESS_TOKEN_TYPE  = "access";
+    private static final String REFRESH_TOKEN_TYPE = "refresh";
+
     private final SecretKey secretKey;
     private final long accessTokenExpiry;
     private final long refreshTokenExpiry;
@@ -31,11 +35,11 @@ public class JwtProvider {
     }
 
     public String generateAccessToken(Long userId) {
-        return buildToken(userId, accessTokenExpiry);
+        return buildToken(userId, ACCESS_TOKEN_TYPE, accessTokenExpiry);
     }
 
     public String generateRefreshToken(Long userId) {
-        return buildToken(userId, refreshTokenExpiry);
+        return buildToken(userId, REFRESH_TOKEN_TYPE, refreshTokenExpiry);
     }
 
     public Long getUserId(String token) {
@@ -52,10 +56,20 @@ public class JwtProvider {
         }
     }
 
-    private String buildToken(Long userId, long expiryMs) {
+    public boolean isRefreshToken(String token) {
+        try {
+            String type = parseClaims(token).get(TOKEN_TYPE_CLAIM, String.class);
+            return REFRESH_TOKEN_TYPE.equals(type);
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    private String buildToken(Long userId, String type, long expiryMs) {
         Date now = new Date();
         return Jwts.builder()
                 .claim("userId", userId)
+                .claim(TOKEN_TYPE_CLAIM, type)
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expiryMs))
                 .signWith(secretKey)

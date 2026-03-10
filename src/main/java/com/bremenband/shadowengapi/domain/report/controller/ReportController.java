@@ -31,7 +31,7 @@ public class ReportController {
             @Valid @RequestBody ReportCreateRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     ) {
-        return ApiResponse.success(reportService.createReport(sessionId));
+        return ApiResponse.success(reportService.createReport(sessionId, userId));
     }
 
     @GetMapping("/study-sessions/{sessionId}/reports")
@@ -44,7 +44,7 @@ public class ReportController {
             @PathVariable Long sessionId,
             @Parameter(hidden = true) @AuthenticationPrincipal Long userId
     ) {
-        return ApiResponse.success(reportService.getReport(sessionId));
+        return ApiResponse.success(reportService.getReport(sessionId, userId));
     }
 
     @GetMapping("/reports/daily")

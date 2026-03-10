@@ -37,10 +37,14 @@ public class ReportService {
     private final WeekSentenceRepository weekSentenceRepository;
 
     @Transactional
-    public ReportResponse createReport(Long sessionId) {
+    public ReportResponse createReport(Long sessionId, Long userId) {
         // 1. 세션 조회
         StudySession session = studySessionRepository.findById(sessionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.SESSION_NOT_FOUND));
+
+        if (!session.getUser().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
 
         // 2. 세션 평가 결과 조회
         List<Evaluation> evaluations = evaluationRepository.findByStudySession_Id(sessionId);
@@ -130,9 +134,13 @@ public class ReportService {
     }
 
     @Transactional(readOnly = true)
-    public ReportResponse getReport(Long sessionId) {
+    public ReportResponse getReport(Long sessionId, Long userId) {
         Report report = reportRepository.findByStudySession_Id(sessionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.REPORT_NOT_FOUND));
+
+        if (!report.getStudySession().getUser().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
 
         List<WeekSentence> weekSentences = weekSentenceRepository.findByReport_Id(report.getId());
 

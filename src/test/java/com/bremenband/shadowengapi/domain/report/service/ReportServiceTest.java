@@ -44,6 +44,8 @@ class ReportServiceTest {
     @Mock private ReportRepository       reportRepository;
     @Mock private WeekSentenceRepository weekSentenceRepository;
 
+    private static final Long USER_ID = 1L;
+
     // ── 헬퍼 ────────────────────────────────────────────────────────────────────
 
     private StudySession buildSession(Long sessionId) {
@@ -52,6 +54,7 @@ class ReportServiceTest {
                 .thumbnailUrl("th").duration(212).channelTitle("Ch").build();
         User user = User.builder()
                 .email("u@e.com").nickname("nick").provider("KAKAO").providerId("p").build();
+        ReflectionTestUtils.setField(user, "id", USER_ID);
         StudySession session = StudySession.builder()
                 .video(video).user(user).startSec(0).endSec(60).build();
         ReflectionTestUtils.setField(session, "id", sessionId);
@@ -126,7 +129,7 @@ class ReportServiceTest {
         given(weekSentenceRepository.save(any(WeekSentence.class))).willReturn(ws);
 
         // when
-        ReportResponse response = reportService.createReport(sessionId);
+        ReportResponse response = reportService.createReport(sessionId, USER_ID);
 
         // then
         assertThat(response.sessionId()).isEqualTo(sessionId);
@@ -161,7 +164,7 @@ class ReportServiceTest {
         given(reportRepository.save(any(Report.class))).willReturn(savedReport);
 
         // when
-        ReportResponse response = reportService.createReport(sessionId);
+        ReportResponse response = reportService.createReport(sessionId, USER_ID);
 
         // then
         assertThat(response.difficultSentences()).isEmpty();
@@ -185,7 +188,7 @@ class ReportServiceTest {
         given(reportRepository.save(any(Report.class))).willReturn(savedReport);
 
         // when
-        reportService.createReport(sessionId);
+        reportService.createReport(sessionId, USER_ID);
 
         // then — 기존 레포트의 WeekSentence 삭제 후 레포트 삭제
         then(weekSentenceRepository).should(times(1)).deleteByReport_Id(99L);
@@ -200,7 +203,7 @@ class ReportServiceTest {
         given(studySessionRepository.findById(999L)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> reportService.createReport(999L))
+        assertThatThrownBy(() -> reportService.createReport(999L, USER_ID))
                 .isInstanceOf(CustomException.class)
                 .extracting("errorCode").isEqualTo(ErrorCode.SESSION_NOT_FOUND);
 
@@ -216,7 +219,7 @@ class ReportServiceTest {
         given(evaluationRepository.findByStudySession_Id(sessionId)).willReturn(List.of());
 
         // when & then
-        assertThatThrownBy(() -> reportService.createReport(sessionId))
+        assertThatThrownBy(() -> reportService.createReport(sessionId, USER_ID))
                 .isInstanceOf(CustomException.class)
                 .extracting("errorCode").isEqualTo(ErrorCode.NO_EVALUATIONS_FOR_REPORT);
 

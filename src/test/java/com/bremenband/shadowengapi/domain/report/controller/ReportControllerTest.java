@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -52,7 +53,7 @@ class ReportControllerTest {
                 List.of(new ReportResponse.DifficultSentence(10L, "I got it bad."))
         );
 
-        given(reportService.createReport(eq(sessionId))).willReturn(response);
+        given(reportService.createReport(eq(sessionId), any())).willReturn(response);
 
         String body = objectMapper.writeValueAsString(Map.of("sessionId", sessionId));
 
@@ -77,7 +78,7 @@ class ReportControllerTest {
                 .andExpect(jsonPath("$.data.difficultSentences[0].sentenceId").value(10))
                 .andExpect(jsonPath("$.data.difficultSentences[0].sentence").value("I got it bad."));
 
-        then(reportService).should(times(1)).createReport(eq(sessionId));
+        then(reportService).should(times(1)).createReport(eq(sessionId), any());
     }
 
     @Test
@@ -86,7 +87,7 @@ class ReportControllerTest {
         // given
         Long sessionId = 1L;
 
-        given(reportService.createReport(eq(sessionId)))
+        given(reportService.createReport(eq(sessionId), any()))
                 .willThrow(new CustomException(ErrorCode.NO_EVALUATIONS_FOR_REPORT));
 
         String body = objectMapper.writeValueAsString(Map.of("sessionId", sessionId));
@@ -111,7 +112,7 @@ class ReportControllerTest {
         // given
         Long sessionId = 999L;
 
-        given(reportService.createReport(eq(sessionId)))
+        given(reportService.createReport(eq(sessionId), any()))
                 .willThrow(new CustomException(ErrorCode.SESSION_NOT_FOUND));
 
         String body = objectMapper.writeValueAsString(Map.of("sessionId", sessionId));

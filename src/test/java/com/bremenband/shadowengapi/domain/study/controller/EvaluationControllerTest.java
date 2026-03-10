@@ -58,7 +58,7 @@ class EvaluationControllerTest {
                 new EvaluationResponse.Scores(73.7, 93.8, 37.6, 73.0, 55.8, 76.0, 85.2, 100.0)
         );
 
-        given(evaluationService.evaluate(eq(sessionId), eq(sentenceId), any())).willReturn(response);
+        given(evaluationService.evaluate(eq(sessionId), eq(sentenceId), any(), any())).willReturn(response);
 
         MockMultipartFile audio = new MockMultipartFile(
                 "file", "test.wav", "audio/wav", "audio-bytes".getBytes());
@@ -87,7 +87,7 @@ class EvaluationControllerTest {
                 .andExpect(jsonPath("$.data.scores.totalScore").value(73.7))
                 .andExpect(jsonPath("$.data.scores.wordAccuracy").value(93.8));
 
-        then(evaluationService).should(times(1)).evaluate(eq(sessionId), eq(sentenceId), any());
+        then(evaluationService).should(times(1)).evaluate(eq(sessionId), eq(sentenceId), any(), any());
     }
 
     @Test
@@ -97,7 +97,7 @@ class EvaluationControllerTest {
         Long sessionId  = 999L;
         Long sentenceId = 10L;
 
-        given(evaluationService.evaluate(eq(sessionId), eq(sentenceId), any()))
+        given(evaluationService.evaluate(eq(sessionId), eq(sentenceId), any(), any()))
                 .willThrow(new CustomException(ErrorCode.SESSION_NOT_FOUND));
 
         MockMultipartFile audio = new MockMultipartFile(
@@ -123,7 +123,7 @@ class EvaluationControllerTest {
         Long sessionId  = 1L;
         Long sentenceId = 10L;
 
-        given(evaluationService.evaluate(eq(sessionId), eq(sentenceId), any()))
+        given(evaluationService.evaluate(eq(sessionId), eq(sentenceId), any(), any()))
                 .willThrow(new CustomException(ErrorCode.VOICE_RECOGNITION_FAILED));
 
         MockMultipartFile audio = new MockMultipartFile(

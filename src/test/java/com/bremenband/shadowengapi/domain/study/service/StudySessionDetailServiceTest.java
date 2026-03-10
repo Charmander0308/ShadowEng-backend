@@ -1,6 +1,7 @@
 package com.bremenband.shadowengapi.domain.study.service;
 
 import com.bremenband.shadowengapi.domain.study.dto.res.StudySessionCreateResponse;
+import com.bremenband.shadowengapi.domain.study.entity.Evaluation;
 import com.bremenband.shadowengapi.domain.study.entity.Sentence;
 import com.bremenband.shadowengapi.domain.study.entity.StudySession;
 import com.bremenband.shadowengapi.domain.study.entity.Video;
@@ -46,6 +47,8 @@ class StudySessionDetailServiceTest {
 
     // ── 헬퍼 ────────────────────────────────────────────────────────────────────
 
+    private static final Long USER_ID = 1L;
+
     private StudySession buildSession(Long sessionId) {
         Video video = Video.builder()
                 .videoId(VIDEO_ID)
@@ -59,6 +62,7 @@ class StudySessionDetailServiceTest {
         User user = User.builder()
                 .email("user@example.com").nickname("브레맨")
                 .provider("KAKAO").providerId("kakao-123").build();
+        ReflectionTestUtils.setField(user, "id", USER_ID);
 
         StudySession session = StudySession.builder()
                 .video(video).user(user).startSec(10.0).endSec(30.0).build();
@@ -77,6 +81,22 @@ class StudySessionDetailServiceTest {
         return sentence;
     }
 
+    private Evaluation buildEvaluation(Sentence sentence, StudySession session) {
+        return Evaluation.builder()
+                .studySession(session).sentence(sentence)
+                .userTranscription("test")
+                .wordLevelFeedback("[]").boundaryToneFeedback("{}").dynamicStressFeedback("{}")
+                .totalScore(java.math.BigDecimal.valueOf(80.0))
+                .wordAccuracy(java.math.BigDecimal.valueOf(80.0))
+                .prosodyAndStress(java.math.BigDecimal.valueOf(80.0))
+                .wordRhythmScore(java.math.BigDecimal.valueOf(80.0))
+                .boundaryToneScore(java.math.BigDecimal.valueOf(80.0))
+                .dynamicStressScore(java.math.BigDecimal.valueOf(80.0))
+                .speedSimilarity(java.math.BigDecimal.valueOf(80.0))
+                .pauseSimilarity(java.math.BigDecimal.valueOf(80.0))
+                .build();
+    }
+
     // ── 테스트 케이스 ────────────────────────────────────────────────────────────
 
     @Test
@@ -88,13 +108,16 @@ class StudySessionDetailServiceTest {
         Sentence s1 = buildSentence(10L, session, 5.61, 10.78, 5.17);
         Sentence s2 = buildSentence(11L, session, 11.1, 15.83, 4.73);
 
+        // 문장 10에 대한 평가 2개, 문장 11에 대한 평가 0개
+        Evaluation eval1 = buildEvaluation(s1, session);
+        Evaluation eval2 = buildEvaluation(s1, session);
+
         given(studySessionRepository.findById(sessionId)).willReturn(Optional.of(session));
         given(sentenceRepository.findByStudySession_Id(sessionId)).willReturn(List.of(s1, s2));
-        given(evaluationRepository.countBySentence_Id(10L)).willReturn(2L);
-        given(evaluationRepository.countBySentence_Id(11L)).willReturn(0L);
+        given(evaluationRepository.findByStudySession_Id(sessionId)).willReturn(List.of(eval1, eval2));
 
         // when
-        StudySessionCreateResponse response = studySessionService.getStudySession(sessionId);
+        StudySessionCreateResponse response = studySessionService.getStudySession(sessionId, USER_ID);
 
         // then
         assertThat(response.sessionId()).isEqualTo(sessionId);
@@ -122,8 +145,7 @@ class StudySessionDetailServiceTest {
 
         then(studySessionRepository).should(times(1)).findById(sessionId);
         then(sentenceRepository).should(times(1)).findByStudySession_Id(sessionId);
-        then(evaluationRepository).should(times(1)).countBySentence_Id(10L);
-        then(evaluationRepository).should(times(1)).countBySentence_Id(11L);
+        then(evaluationRepository).should(times(1)).findByStudySession_Id(sessionId);
     }
 
     @Test
@@ -135,9 +157,10 @@ class StudySessionDetailServiceTest {
 
         given(studySessionRepository.findById(sessionId)).willReturn(Optional.of(session));
         given(sentenceRepository.findByStudySession_Id(sessionId)).willReturn(List.of());
+        given(evaluationRepository.findByStudySession_Id(sessionId)).willReturn(List.of());
 
         // when
-        StudySessionCreateResponse response = studySessionService.getStudySession(sessionId);
+        StudySessionCreateResponse response = studySessionService.getStudySession(sessionId, USER_ID);
 
         // then
         assertThat(response.sessionId()).isEqualTo(sessionId);
@@ -152,7 +175,7 @@ class StudySessionDetailServiceTest {
         given(studySessionRepository.findById(sessionId)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> studySessionService.getStudySession(sessionId))
+        assertThatThrownBy(() -> studySessionService.getStudySession(sessionId, USER_ID))
                 .isInstanceOf(CustomException.class)
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.SESSION_NOT_FOUND);
